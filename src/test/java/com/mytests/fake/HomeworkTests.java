@@ -17,24 +17,14 @@ import static org.hamcrest.junit.MatcherAssert.assertThat;
 
 public class HomeworkTests {
 
+    @Test
+    public void verifyIfStatusCodeIs404WhenUrlNotExists() {
+        Response response = RestAssured.given().contentType(ContentType.JSON)
+                .get("http://jsonplaceholder.typicode.com/testing");
+        response.then().statusCode(404);
 
-//- Write automation tests in order to validate other status codes, other than 200 (400 FOR E.G.) for all endpoints;
-//- Print all the users which their emails domain ends with biz; -done
-//- Using the users endpoint print all the ids and its names for which the lat coordinate is between -39 and 15 and lng is between -100 and 50; -done
-//- Using the photos endpoint for each albumId count all the ids and print the number; -done
-// - Using the photos endpoint check if the title from an album is anagram with the title from another album. -done
-
-
-//    @Test
-//    public void verifyIfStatusCodeIs404WhenPhotoNotExists() {
-//        Response response = RestAssured.given().contentType(ContentType.JSON)
-//                .get("http://jsonplaceholder.typicode.com/albumω");
-//        response.then().statusCode(404);
-//
-////        assertThat("The Status cs404",
-////                response.then().extract().body().jsonPath().get("findAll {it.id == 2 && it.albumId == 1}[0].url"),
-////                Matchers.is("https://via.placeholder.com/600/771796"));
-//    }
+        assertThat("The status Code is 200", response.getStatusCode(), Matchers.is(404));
+    }
 
     @Test
     public void verifyAllUsersEmailsThatEndsWithBiz() {
