@@ -4,12 +4,8 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 import org.hamcrest.Matchers;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Test;
 
-import javax.sound.sampled.FloatControl;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,18 +109,23 @@ public class HomeworkTests {
 
         ArrayList<HashMap<String, String>> numberOfTitles = response.then().extract().path("findAll {it}.title");
         System.out.println("Total number of titles is: " + numberOfTitles.size());
+        int titleId = 2;
+        String title = response.then().extract().path("findAll {it}[" + titleId + "].title").toString();
+        String sortedTitle = sortAndLowerCaseString(title);
 
-        String title = response.then().extract().path("findAll {it}[10].title").toString();
-        String sortedTitle = sortString(title);
-        Integer i;
+        System.out.println("The title chose is: " + title);
+        System.out.println("The title sorted is: " + sortedTitle);
+        int i;
         List<Integer> numberOfIds = new ArrayList<>();
 
         for (i = 0; i < numberOfTitles.size(); i++) {
-            String titleToCompare = response.then().extract().path("findAll {it}[" + i + "].title").toString();
-            String titleToCompareSorted = sortString(titleToCompare);
-            if (sortedTitle.equals(titleToCompareSorted)) {
-                numberOfIds.add(i);
-                assertThat("Title is angram with another title from list", titleToCompareSorted, Matchers.is(sortedTitle));
+            if (i != titleId) {
+                String titleToCompare = response.then().extract().path("findAll {it}[" + i + "].title").toString();
+                String titleToCompareSorted = sortAndLowerCaseString(titleToCompare);
+                if (sortedTitle.equals(titleToCompareSorted)) {
+                    numberOfIds.add(i);
+                    assertThat("Title is angram with another title from list", titleToCompareSorted, Matchers.is(sortedTitle));
+                }
             }
         }
         if (numberOfIds.size() == 0)
@@ -135,10 +136,48 @@ public class HomeworkTests {
             System.out.println("This title is anagram with " + numberOfIds.size() + " titles and the titles are: " + numberOfIds);
     }
 
-    public String sortString(String stringToBeSorted) {
-        char[] chars = stringToBeSorted.toCharArray();
+    @Test
+    public void verifyIfAnagramMethodItWorks() {
+        ArrayList<String> numberOfTitles = new ArrayList<>();
+        numberOfTitles.add("Geeks");
+        numberOfTitles.add("eegsk");
+        numberOfTitles.add("siunj");
+        numberOfTitles.add("keeGs");
+        numberOfTitles.add("junsj");
+        numberOfTitles.add("uomiuoij");
+
+        System.out.println("Total number of titles is: " + numberOfTitles.size());
+        int titleId = 0;
+        String title = numberOfTitles.get(titleId);
+        String sortedTitle = sortAndLowerCaseString(title);
+        System.out.println("The title chose is: " + title);
+        System.out.println("The title sorted is: " + sortedTitle);
+        int i;
+        List<Integer> numberOfIds = new ArrayList<>();
+
+        for (i = 0; i < numberOfTitles.size(); i++) {
+            if (i != titleId) {
+                String titleToCompare = numberOfTitles.get(i);
+                String titleToCompareSorted = sortAndLowerCaseString(titleToCompare);
+                if (sortedTitle.equals(titleToCompareSorted)) {
+                    numberOfIds.add(i);
+                    assertThat("Title is angram with another title from list", titleToCompareSorted, Matchers.is(sortedTitle));
+                }
+            }
+        }
+        if (numberOfIds.size() == 0)
+            System.out.println("This title is not anagram with any title");
+        else if (numberOfIds.size() == 1)
+            System.out.println("This title is anagram with title " + numberOfIds);
+        else
+            System.out.println("This title is anagram with " + numberOfIds.size() + " titles and the titles are: " + numberOfIds);
+    }
+
+    public String sortAndLowerCaseString(String stringToBeSorted) {
+        String lowerCaseString = stringToBeSorted.toLowerCase();
+        char[] chars = lowerCaseString.toCharArray();
         Arrays.sort(chars);
-        return new String(chars).toLowerCase(Locale.ROOT);
+        return new String(chars);
     }
 
     public ArrayList<Float> convertArrayListStringToArrayListFloat(ArrayList<String> arrayToBeConverted) {
